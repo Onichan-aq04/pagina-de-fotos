@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang = "es">
+<head>
+<meta charset = "utf-8">
+<meta name = "viewport" content = "width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name = "theme-color" content = "#fff7f2">
+<title>Fotos de la fiesta< / title>
+<link rel = "icon" href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎉</text></svg>">
+<style>
+    :root{ --bg:#fff7f2;--card:#fff;--ink:#2b1d2e;--mut:#7a6a7d;--acc:#e0457b;--acc2:#ff9e5e;--line:#f1dfe3;box - sizing:border - box }
+@media(prefers - color - scheme:dark) { :root:not([data - theme = "light"]) { --bg:#1c1420;--card:#2a1f2f;--ink:#f8eef5;--mut:#b9a6bd;--line:#3d2d44 } }
+:root[data - theme = "dark"]{ --bg:#1c1420;--card:#2a1f2f;--ink:#f8eef5;--mut:#b9a6bd;--line:#3d2d44 }
+* { box - sizing:border - box }html{ scroll - padding - top:env(safe - area - inset - top,0px) }
+body{ margin : 0;background:var(--bg);color:var(--ink);font - family:system - ui,-apple - system,"Segoe UI",sans - serif;line - height:1.5 }
+main{ max - width:720px;margin:0 auto;padding:28px 18px 48px }
+h1{ font - size:1.9rem;margin:.2em 0 .1em;text - align:center }
+p.sub{ text - align:center;color:var(--mut);margin:0 0 24px }
+.card{ background:var(--card);border:1px solid var(--line);border - radius:18px;padding:22px;text - align:center;margin - bottom:16px }
+button, label.btn{ display:inline - block;border : 0;border - radius:999px;padding:13px 22px;font - size:1rem;font - weight:650;color:#fff;background:linear - gradient(135deg,var(--acc),var(--acc2));cursor:pointer }
+button:disabled{ opacity:.5;cursor:wait }
+button.ghost{ background:transparent;color:var(--acc);border:1.5px solid var(--acc) }
+input[type = email], input[type = password]{ width:100 %;max - width:360px;padding:12px;border:1px solid var(--line);border - radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin:5px 0 }
+#msg, #ownerMsg{ margin - top:14px;min - height:1.4em;color:var(--mut);font - size:.95rem;overflow - wrap:anywhere }
+.bar{ height:8px;border - radius:99px;background:var(--line);overflow:hidden;margin - top:14px;display:none }
+.bar i{ display:block;height:100 %;width : 0;background:linear - gradient(90deg,var(--acc),var(--acc2));transition:width .2s }
+.grid{ display:grid;grid - template - columns:repeat(auto - fill,minmax(110px,1fr));gap:8px;margin - top:18px }
+.grid img{ width:100 %;aspect - ratio:1;object - fit:cover;border - radius:10px;background:var(--line);cursor:pointer }
+.row{ display:flex;gap:10px;justify - content:center;flex - wrap:wrap;margin - top:14px }
+.hide{ display:none!important }
+.small{ font - size:.88rem;color:var(--mut) }
+#lb{ position:fixed;inset : 0;z - index:50;background:rgba(10,6,12,.94);display:flex;flex - direction:column;align - items:center;justify - content:center;gap:12px;padding:calc(16px + env(safe - area - inset - top,0px)) 14px calc(16px + env(safe - area - inset - bottom,0px)) }
+#lb img{ max - width:100 %;max - height:68vh;border - radius:12px;object - fit:contain }
+#lb.nav{ display:flex;gap:10px;align - items:center;color:#fff }
+#lb button{ padding:11px 20px }
+#lbmsg{ color:#ddd;font - size:.9rem;min - height:1.3em;text - align:center }
+hr{ border : 0;border - top:1px solid var(--line);margin:22px 0 }
+< / style>
+< / head>
+<body>
+<main>
+<h1>🎉 ¡Comparte tus fotos!< / h1>
+<p class = "sub">Sube las fotos que tengas de la fiesta desde tu galería.< / p>
+
+<section class = "card" id = "up">
+<input id = "file" type = "file" accept = "image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" multiple hidden>
+<label class = "btn" for = "file" id = "pick">📷 Elegir fotos de mi galería< / label>
+<div class = "small" style = "margin-top:10px">Imágenes de hasta 8 MB cada una.< / div>
+<div class = "bar" id = "bar"><i id = "fill">< / i>< / div>
+<div id = "msg" role = "status" aria - live = "polite">Conectando…< / div>
+< / section>
+
+<section class = "card" id = "ownerLogin">
+<h2 style = "margin-top:0">Acceso del propietario< / h2>
+<p class = "small">Solo el propietario puede abrir la galería privada.< / p>
+<form id = "loginForm">
+<div><input id = "email" type = "email" autocomplete = "username" placeholder = "Correo del propietario" required>< / div>
+<div><input id = "password" type = "password" autocomplete = "current-password" placeholder = "Contraseña" required>< / div>
+<button type = "submit" id = "loginBtn">Entrar a mi galería< / button>
+< / form>
+<div id = "ownerMsg" role = "status" aria - live = "polite">< / div>
+< / section>
+
+<section class = "card hide" id = "owner">
+<h2 style = "margin-top:0">Galería privada< / h2>
+<div id = "count" style = "color:var(--mut)">Cargando…< / div>
+<div class = "small" style = "margin-top:6px">Solo visible para la cuenta del propietario.Toca una foto para verla grande y descargarla en JPG.< / div>
+<div class = "row"><button class = "ghost" id = "refresh">Actualizar galería< / button><button class = "ghost" id = "logout">Cerrar sesión< / button>< / div>
+<div class = "grid" id = "grid">< / div>
+< / section>
+<p class = "small" style = "text-align:center">No subas imágenes privadas o sensibles.Cualquier persona con el enlace puede enviar fotos.< / p>
+< / main>
+
+<div id = "lb" class = "hide" role = "dialog" aria - modal = "true" aria - label = "Vista de foto">
+<img id = "lbimg" alt = "Foto seleccionada">
+<div class = "nav"><button class = "ghost" id = "prev" aria - label = "Foto anterior">‹< / button><span id = "lbn">< / span><button class = "ghost" id = "next" aria - label = "Foto siguiente">›< / button>< / div>
+<div class = "row" style = "margin:0"><button id = "dl">⬇️ Descargar esta foto(JPG) < / button > <button class = "ghost" id = "close" style = "color:#fff;border-color:#fff">Cerrar< / button>< / div>
+<div id = "lbmsg">< / div>
+< / div>
+
+<script src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">< / script>
+<script>
+(function() {
+    "use strict";
+
+    // PASO OBLIGATORIO: reemplaza estos tres valores con los de tu proyecto Supabase.
+    const SUPABASE_URL = "https://ptbjmwewvlawlbqrdvll.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-dahz5PDfIsrXj2WLaT--A_cn1PdlFZ";
+    const OWNER_UID = "49f2c97a-7cc5-466f-814e-5807e709b308";
+    const BUCKET = "party-photos";
+    const MAX_FILE_SIZE = 8 * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+    const $ = id = > document.getElementById(id);
+    let supabaseClient;
+    let currentUser = null;
+    let photos = [];
+    let currentIndex = 0;
+
+    function setMessage(text) { $("msg").textContent = text; }
+    function isConfigured() {
+        return SUPABASE_URL.startsWith("https://") &&
+            !SUPABASE_URL.includes("PEGA_AQUI") &&
+            !SUPABASE_PUBLISHABLE_KEY.includes("PEGA_AQUI") &&
+            !OWNER_UID.includes("PEGA_AQUI");
+    }
+    function ownerIsLoggedIn() {
+        return !!(currentUser && currentUser.id == = OWNER_UID && !currentUser.is_anonymous);
+    }
+    function setBusy(busy) {
+        $("pick").style.pointerEvents = busy ? "none" : "";
+        $("file").disabled = busy;
+    }
+
+    async function ensureSession() {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        if (session) {
+            currentUser = session.user;
+            return;
+        }
+        const { data, error:signInError } = await supabaseClient.auth.signInAnonymously();
+        if (signInError) throw signInError;
+        currentUser = data.user;
+    }
+
+    async function refreshGallery() {
+        if (!ownerIsLoggedIn()) return;
+        $("count").textContent = "Cargando fotos…";
+        $("grid").textContent = "";
+        const { data, error } = await supabaseClient
+            .from("photos")
+            .select("id,path,name,created_at")
+            .order("created_at", { ascending:false });
+        if (error) {
+            $("count").textContent = "No se pudo cargar la galería. Revisa las políticas de Supabase.";
+            console.error(error);
+            return;
+        }
+        photos = data || [];
+        const signed = await Promise.all(photos.map(async p = > {
+            const {data, error} = await supabaseClient.storage.from(BUCKET).createSignedUrl(p.path, 600);
+            return { ...p, signedUrl: error ? null : data.signedUrl };
+        }));
+        photos = signed.filter(p = > p.signedUrl);
+        $("count").textContent = photos.length + (photos.length == = 1 ? " foto" : " fotos");
+        const grid = $("grid");
+        photos.forEach((photo, index) = > {
+            const img = document.createElement("img");
+            img.loading = "lazy";
+            img.alt = photo.name || "Foto de la fiesta";
+            img.src = photo.signedUrl;
+            img.addEventListener("click", () = > showPhoto(index));
+            grid.appendChild(img);
+        });
+    }
+
+    function showPhoto(index) {
+        if (!photos.length) return;
+        currentIndex = (index + photos.length) % photos.length;
+        $("lbimg").src = photos[currentIndex].signedUrl;
+        $("lbn").textContent = (currentIndex + 1) + " / " + photos.length;
+        $("lbmsg").textContent = "";
+        $("lb").classList.remove("hide");
+    }
+
+    async function convertToJpeg(blob) {
+        if (blob.type == = "image/jpeg") return blob;
+        const bitmap = await createImageBitmap(blob);
+        const canvas = document.createElement("canvas");
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close&& bitmap.close();
+        return await new Promise((resolve, reject) = > {
+            canvas.toBlob(out = > out ? resolve(out) : reject(new Error("No se pudo convertir a JPG")), "image/jpeg", .92);
+        });
+    }
+
+    async function uploadFiles(event) {
+        const files = Array.from(event.target.files || []);
+        event.target.value = "";
+        const valid = files.filter(file = > {
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                setMessage("Formato no compatible: " + file.name + ". Usa JPG, PNG, WEBP o GIF.");
+                return false;
+            }
+            if (file.size > MAX_FILE_SIZE) {
+                setMessage("La foto " + file.name + " supera los 8 MB.");
+                return false;
+            }
+            return true;
+        });
+        if (!valid.length) return;
+
+        setBusy(true);
+        $("bar").style.display = "block";
+        let ok = 0, failed = 0;
+        for (let i = 0;i < valid.length;i++) {
+            const file = valid[i];
+            setMessage("Subiendo " + (i + 1) + " de " + valid.length + "…");
+            $("fill").style.width = Math.round(i / valid.length * 100) + "%";
+            try {
+                // Nombres aleatorios para evitar colisiones y no revelar el nombre original.
+                const safeName = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2));
+                const path = safeName + "." + ({ "image/jpeg":"jpg","image/png" : "png","image/webp" : "webp","image/gif" : "gif" }[file.type]);
+                const { error:uploadError } = await supabaseClient.storage.from(BUCKET).upload(path, file, {
+                  cacheControl:"3600", upsert : false, contentType : file.type
+                    });
+                if (uploadError) throw uploadError;
+                const { error:dbError } = await supabaseClient.from("photos").insert({
+                  path:path, name : file.name.slice(0,180)
+                    });
+                if (dbError) {
+                    // No se expone el error técnico al visitante.
+                    console.error(dbError);
+                    failed++;
+                }
+                else {
+                    ok++;
+                }
+            }
+            catch (error) {
+                console.error(error);
+                failed++;
+            }
+            $("fill").style.width = Math.round((i + 1) / valid.length * 100) + "%";
+        }
+        setBusy(false);
+        setMessage(failed ? "Subidas: " + ok + ". No se pudieron subir: " + failed + ". Revisa la configuración e inténtalo de nuevo." : "¡Listo! " + ok + (ok == = 1 ? " foto subida 💖" : " fotos subidas 💖"));
+        setTimeout(() = > {$("bar").style.display = "none";$("fill").style.width = "0"}, 1600);
+    }
+
+    async function ownerLogin(event) {
+        event.preventDefault();
+        $("loginBtn").disabled = true;
+        $("ownerMsg").textContent = "Iniciando sesión…";
+        const email = $("email").value.trim();
+        const password = $("password").value;
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email,password });
+        $("loginBtn").disabled = false;
+        if (error) {
+            $("ownerMsg").textContent = "No se pudo iniciar sesión. Comprueba el correo y la contraseña.";
+            console.error(error);
+            return;
+        }
+        currentUser = data.user;
+        if (!ownerIsLoggedIn()) {
+            $("ownerMsg").textContent = "Esta cuenta no está configurada como propietaria.";
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            await ensureSession();
+            return;
+        }
+        $("ownerLogin").classList.add("hide");
+        $("up").classList.add("hide");
+        $("owner").classList.remove("hide");
+        $("ownerMsg").textContent = "";
+        await refreshGallery();
+    }
+
+    async function logoutOwner() {
+        await supabaseClient.auth.signOut();
+        currentUser = null;
+        $("owner").classList.add("hide");
+        $("ownerLogin").classList.remove("hide");
+        $("up").classList.remove("hide");
+        try {
+            await ensureSession();
+            setMessage("Listo para subir fotos.");
+        }
+        catch (error) {
+            setMessage("No se pudo iniciar la sesión de invitado. Recarga la página.");
+            console.error(error);
+        }
+    }
+
+    async function init() {
+        if (!isConfigured()) {
+            setMessage("Falta configurar Supabase: edita las tres constantes indicadas en el código.");
+            $("pick").classList.add("hide");
+            $("ownerLogin").classList.add("hide");
+            return;
+        }
+        if (!window.supabase || !window.supabase.createClient) {
+            setMessage("No se pudo cargar la biblioteca de Supabase. Comprueba tu conexión.");
+            return;
+        }
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        try {
+            await ensureSession();
+            if (ownerIsLoggedIn()) {
+                $("up").classList.add("hide");
+                $("ownerLogin").classList.add("hide");
+                $("owner").classList.remove("hide");
+                await refreshGallery();
+            }
+            else {
+                setMessage("Ya puedes elegir y subir fotos. Solo el propietario puede ver la galería.");
+            }
+        }
+        catch (error) {
+            setMessage("No se pudo conectar. Comprueba que estén habilitados los inicios de sesión anónimos en Supabase.");
+            console.error(error);
+        }
+    }
+
+    $("file").addEventListener("change", uploadFiles);
+    $("loginForm").addEventListener("submit", ownerLogin);
+    $("refresh").addEventListener("click", refreshGallery);
+    $("logout").addEventListener("click", logoutOwner);
+    $("prev").addEventListener("click", () = > showPhoto(currentIndex - 1));
+    $("next").addEventListener("click", () = > showPhoto(currentIndex + 1));
+    $("close").addEventListener("click", () = > $("lb").classList.add("hide"));
+    $("lb").addEventListener("click", e = > {if (e.target == = $("lb"))$("lb").classList.add("hide")});
+    document.addEventListener("keydown", e = > {
+        if (e.key == = "Escape") $("lb").classList.add("hide");
+        if (!$("lb").classList.contains("hide") && e.key == = "ArrowLeft") showPhoto(currentIndex - 1);
+        if (!$("lb").classList.contains("hide") && e.key == = "ArrowRight") showPhoto(currentIndex + 1);
+    });
+    $("dl").addEventListener("click", async() = > {
+        if (!ownerIsLoggedIn() || !photos[currentIndex]) return;
+        const button = $("dl");
+        button.disabled = true;
+        $("lbmsg").textContent = "Preparando descarga…";
+        try {
+            const response = await fetch(photos[currentIndex].signedUrl);
+            if (!response.ok) throw new Error("download");
+            const jpg = await convertToJpeg(await response.blob());
+            const url = URL.createObjectURL(jpg);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "foto-" + String(currentIndex + 1).padStart(3, "0") + ".jpg";
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() = > URL.revokeObjectURL(url), 1500);
+            $("lbmsg").textContent = "";
+        }
+        catch (error) {
+            $("lbmsg").textContent = "No se pudo descargar esta foto. Intenta de nuevo.";
+            console.error(error);
+        }
+        finally { button.disabled = false }
+    });
+
+    init();
+})();
+< / script>
+< / body>
+< / html>
